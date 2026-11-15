@@ -3,9 +3,25 @@
 [ext_resource type="Script" uid="uid://drobqhce2ef7k" path="res://new_gd_script.gd" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://b3k4lopgvix46" path="res://cards.gd" id="1_h2yge"]
 [ext_resource type="Texture2D" uid="uid://ldnf6w8tp6vr" path="res://assets/other/background6767.png" id="3_h2yge"]
+[ext_resource type="Texture2D" uid="uid://isvnjxxpwyrk" path="res://assets/other/draw.png" id="4_7mycd"]
+[ext_resource type="Texture2D" uid="uid://df23fb6cnhjvj" path="res://assets/other/timer.png" id="4_272bh"]
+[ext_resource type="Texture2D" uid="uid://dgtbpn1km75hp" path="res://assets/timernums/0.png" id="5_4c57u"]
+[ext_resource type="Script" uid="uid://cavcfjv3kboc0" path="res://draw.gd" id="5_272bh"]
+[ext_resource type="Texture2D" uid="uid://cdrmfgididyi5" path="res://assets/other/draw_pressed.png" id="6_5vw27"]
+[ext_resource type="Texture2D" uid="uid://dhe7k65j6hgn" path="res://assets/other/timeline.png" id="8_5vw27"]
+[ext_resource type="Texture2D" uid="uid://di6almoa306m4" path="res://assets/cards/7.png" id="9_kek77"]
+[ext_resource type="Texture2D" uid="uid://dwu00ou1u6cyy" path="res://assets/other/Clock-Arrow.png" id="11_dg77c"]
+[ext_resource type="Texture2D" uid="uid://c1t7ky63a3588" path="res://assets/other/Clock.png" id="12_ycdy4"]
+[ext_resource type="Texture2D" uid="uid://bhjnq2tan1a51" path="res://assets/other/Score-Box.png" id="13_ycdy4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tm8yy"]
+size = Vector2(30, 60)
 
 [node name="Node2D" type="Node2D" unique_id=452847566]
 script = ExtResource("1_0xm2m")
+
+[node name="Timer" type="Timer" parent="." unique_id=1654986632]
+autostart = true
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=394477206]
 anchor_mode = 0
@@ -27,5 +43,83 @@ z_index = -1000
 position = Vector2(160, 90)
 texture = ExtResource("3_h2yge")
 
-[node name="Node2D" type="Node2D" parent="." unique_id=117447005]
-position = Vector2(160, 10)
+[node name="timerthing" type="Node2D" parent="." unique_id=117447005]
+position = Vector2(30, 17.5)
+
+[node name="timer" type="Sprite2D" parent="timerthing" unique_id=1831817893]
+texture = ExtResource("4_272bh")
+
+[node name="num1" type="Sprite2D" parent="timerthing" unique_id=711297159]
+position = Vector2(-12.5, 0)
+texture = ExtResource("5_4c57u")
+
+[node name="num2" type="Sprite2D" parent="timerthing" unique_id=1566383517]
+position = Vector2(12.5, 0)
+texture = ExtResource("5_4c57u")
+
+[node name="Draw" type="Sprite2D" parent="." unique_id=1136331833]
+position = Vector2(160, 126)
+texture = ExtResource("4_7mycd")
+script = ExtResource("5_272bh")
+hover_texture = ExtResource("6_5vw27")
+
+[node name="Area2D" type="Area2D" parent="Draw" unique_id=1445848489]
+position = Vector2(-160, -130)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Draw/Area2D" unique_id=1626428442]
+position = Vector2(160, 129.5)
+shape = SubResource("RectangleShape2D_tm8yy")
+
+[node name="timeline" type="Node2D" parent="." unique_id=1745994178]
+visible = false
+position = Vector2(160, 171)
+scale = Vector2(1, 0.25)
+
+[node name="Timeline" type="Sprite2D" parent="timeline" unique_id=260856787]
+texture = ExtResource("8_5vw27")
+
+[node name="7" type="Sprite2D" parent="timeline" unique_id=1906968045]
+position = Vector2(88, 0)
+scale = Vector2(0.207, 0.86)
+texture = ExtResource("9_kek77")
+
+[node name="8" type="Sprite2D" parent="timeline" unique_id=300439811]
+position = Vector2(78, 0)
+scale = Vector2(0.207, 0.86)
+texture = ExtResource("9_kek77")
+
+[node name="Clock1" type="Node2D" parent="." unique_id=1041358832]
+position = Vector2(70, 17)
+
+[node name="ClockArrow" type="Sprite2D" parent="Clock1" unique_id=1423434099]
+texture = ExtResource("11_dg77c")
+offset = Vector2(0, -1)
+
+[node name="Clock" type="Sprite2D" parent="Clock1" unique_id=1183119159]
+z_index = -1
+texture = ExtResource("12_ycdy4")
+
+[node name="Clock2" type="Node2D" parent="." unique_id=1452046901]
+position = Vector2(250, 17)
+
+[node name="ClockArrow" type="Sprite2D" parent="Clock2" unique_id=346131107]
+texture = ExtResource("11_dg77c")
+offset = Vector2(0, -1)
+
+[node name="Clock" type="Sprite2D" parent="Clock2" unique_id=1389315868]
+z_index = -1
+texture = ExtResource("12_ycdy4")
+
+[node name="Scorebox" type="Node2D" parent="." unique_id=701217956]
+position = Vector2(160, 15)
+
+[node name="ScoreBox" type="Sprite2D" parent="Scorebox" unique_id=973880511]
+texture = ExtResource("13_ycdy4")
+
+[node name="num1" type="Sprite2D" parent="Scorebox" unique_id=82953057]
+position = Vector2(-12.5, 0)
+texture = ExtResource("5_4c57u")
+
+[node name="num2" type="Sprite2D" parent="Scorebox" unique_id=1737120663]
+position = Vector2(12.5, 0)
+texture = ExtResource("5_4c57u")
