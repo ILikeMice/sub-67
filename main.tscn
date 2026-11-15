@@ -1,144 +1,31 @@
 [gd_scene format=3 uid="uid://c3xilvbj7j474"]
 
+[ext_resource type="Script" uid="uid://drobqhce2ef7k" path="res://new_gd_script.gd" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://b3k4lopgvix46" path="res://cards.gd" id="1_h2yge"]
-[ext_resource type="Texture2D" uid="uid://di6almoa306m4" path="res://assets/cards/7.png" id="3_1bvp3"]
-[ext_resource type="Texture2D" uid="uid://cyu3vdmxqayhk" path="res://assets/cards/6.png" id="3_h2yge"]
-
-[sub_resource type="GDScript" id="GDScript_7dm0k"]
-script/source = "extends Node2D
-
-var cardslist = {1: [], 2:[], 3:[]}
-var hovered_cards = []
-var current_card = null
-var active_tweens = {}
-
-var numbers = range(11).map(func(i): return str(i))
-
-var specials = [\"m5\",\"p3\",\"x2\"]
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	addcard(\"10\", 1)
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-
-func addcard(card: String, player: int):
-	
-	var createdcard = Node2D.new()
-	var carea = Area2D.new()
-	var ccs = CollisionShape2D.new()
-	var rect = RectangleShape2D.new()
-	
-	var sprite = Sprite2D.new()
-	
-	var path = \"res://assets/cards/%s.png\" % card
-	print(path, \" exists: \", ResourceLoader.exists(path))
-
-	var texture = load(path) as Texture2D
-	print(\"texture: \", texture)
-	sprite.texture = texture
-	rect.size = Vector2(37, 50)
-	ccs.shape = rect
-	
-	createdcard.add_child(sprite)
-	carea.add_child(ccs)
-	createdcard.add_child(carea)
-	
-	if player == 1:
-		cardslist[player].append(card)
-		$Cards_1.add_child(createdcard)
-		print(cardslist)
-	_connect(createdcard)
-	print(card)
-
-func _connect(card):
-	for child in card.get_children():
-		if child is Area2D:
-			child.mouse_entered.connect(_highlight.bind(card))
-			child.mouse_exited.connect(_unhigh.bind(card))
-			break
-
-func _unhigh(card) -> void:
-	hovered_cards.erase(card)
-	_update_hover()
-
-func _highlight(card) -> void:
-	if not hovered_cards.has(card):
-		hovered_cards.append(card)
-	_update_hover()
-
-func _update_hover():
-	var highest_card = null
-	for card in hovered_cards:
-		if highest_card == null or card.z_index > highest_card.z_index:
-			highest_card = card
-	if highest_card == current_card:
-		return
-	if current_card != null:
-		_animate_card(current_card, 0)
-
-	current_card = highest_card
-	if current_card != null:
-		_animate_card(current_card, -20)
-
-func _animate_card(card, target_y):
-	if active_tweens.has(card):
-		active_tweens[card].kill()
-
-	var sprite = findchild(card, \"Sprite2D\")
-	var target_pos = Vector2(sprite.position.x, target_y)
-	var tween = create_tween()
-	active_tweens[card] = tween
-	tween.tween_property(sprite, \"position\", target_pos, 0.1)
-
-func findchild(parent: Node, type_name: String) -> Node:
-	for child in parent.get_children():
-		if child.is_class(type_name):
-			return child
-	return null
-"
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tm8yy"]
-size = Vector2(37, 50)
+[ext_resource type="Texture2D" uid="uid://ldnf6w8tp6vr" path="res://assets/other/background6767.png" id="3_h2yge"]
 
 [node name="Node2D" type="Node2D" unique_id=452847566]
-script = SubResource("GDScript_7dm0k")
+script = ExtResource("1_0xm2m")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=394477206]
 anchor_mode = 0
 
 [node name="Cards_1" type="Node2D" parent="." unique_id=1956810740]
-position = Vector2(160, 140)
+position = Vector2(95, 130)
 script = ExtResource("1_h2yge")
+metadata/player = true
 
-[node name="Card" type="Node2D" parent="Cards_1" unique_id=1114414198]
-visible = false
+[node name="Cards_2" type="Node2D" parent="." unique_id=1897621384]
+position = Vector2(288, 130)
+metadata/player = false
 
-[node name="Sprite2D" type="Sprite2D" parent="Cards_1/Card" unique_id=77553712]
-z_index = 2
-texture = ExtResource("3_1bvp3")
+[node name="Cards_3" type="Node2D" parent="." unique_id=1149169840]
+position = Vector2(160, 60)
 
-[node name="Area2D" type="Area2D" parent="Cards_1/Card" unique_id=118470396]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Cards_1/Card/Area2D" unique_id=777023053]
-shape = SubResource("RectangleShape2D_tm8yy")
-
-[node name="Card2" type="Node2D" parent="Cards_1" unique_id=1343602996]
-visible = false
-
-[node name="Sprite2D" type="Sprite2D" parent="Cards_1/Card2" unique_id=181688308]
-position = Vector2(-29, 0)
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=751825387]
+z_index = -1000
+position = Vector2(160, 90)
 texture = ExtResource("3_h2yge")
 
-[node name="Area2D" type="Area2D" parent="Cards_1/Card2" unique_id=1124711945]
-position = Vector2(-29, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Cards_1/Card2/Area2D" unique_id=1404528845]
-shape = SubResource("RectangleShape2D_tm8yy")
-
-[node name="Played" type="Node2D" parent="." unique_id=1149169840]
+[node name="Node2D" type="Node2D" parent="." unique_id=117447005]
+position = Vector2(160, 10)
