@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://dy1rwte8k11je"]
+
+[ext_resource type="Script" uid="uid://p68y1tgwge7r" path="res://color_rect.gd" id="1_1yvcn"]
+[ext_resource type="Texture2D" uid="uid://dw5b334nuqh6" path="res://assets/other/mainlogo.png" id="1_e4hpb"]
+[ext_resource type="Texture2D" uid="uid://dxgigm0kyjfwi" path="res://assets/other/Play-Button.png" id="2_1yvcn"]
+[ext_resource type="Texture2D" uid="uid://x0vjtepcgmvy" path="res://assets/other/Help-Button.png" id="3_x6rvy"]
+[ext_resource type="Texture2D" uid="uid://bgcs84ufwu28p" path="res://assets/other/Play-Button-Pressed.png" id="4_bprvm"]
+[ext_resource type="Texture2D" uid="uid://d06lv7srxiivw" path="res://assets/other/Help-Button-Pressed.png" id="6_8xq5q"]
+[ext_resource type="Texture2D" uid="uid://dmt5v3dn6m3jv" path="res://assets/other/names.png" id="7_8xq5q"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tm8yy"]
+atlas = ExtResource("1_e4hpb")
+region = Rect2(0, 19.599998, 320, 63.999992)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_33g2f"]
+atlas = ExtResource("7_8xq5q")
+region = Rect2(0, 13, 50, 7.594)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mgc7w"]
+atlas = ExtResource("7_8xq5q")
+region = Rect2(0, 1.5660229, 50, 12.061237)
+margin = Rect2(0, 0, 0, 0.635)
+
+[node name="Control" type="Control" unique_id=1903095479]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1514982514]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(7.2196127e-07, 0.45715362, 0.5181059, 1)
+script = ExtResource("1_1yvcn")
+
+[node name="CenterContainer" type="CenterContainer" parent="ColorRect" unique_id=1932625713]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/CenterContainer" unique_id=1437765476]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TextureRect" type="TextureRect" parent="ColorRect/CenterContainer/VBoxContainer" unique_id=1463411417]
+layout_mode = 2
+texture = SubResource("AtlasTexture_tm8yy")
+
+[node name="TextureButton" type="TextureButton" parent="ColorRect/CenterContainer/VBoxContainer" unique_id=183417948]
+layout_mode = 2
+texture_normal = ExtResource("2_1yvcn")
+texture_hover = ExtResource("4_bprvm")
+stretch_mode = 3
+
+[node name="TextureButton2" type="TextureButton" parent="ColorRect/CenterContainer/VBoxContainer" unique_id=2059084438]
+layout_mode = 2
+texture_normal = ExtResource("3_x6rvy")
+texture_hover = ExtResource("6_8xq5q")
+stretch_mode = 3
+
+[node name="TextureRect2" type="TextureRect" parent="ColorRect/CenterContainer/VBoxContainer" unique_id=983525765]
+layout_mode = 2
+texture = SubResource("AtlasTexture_33g2f")
+stretch_mode = 3
+
+[node name="TextureRect3" type="TextureRect" parent="ColorRect/CenterContainer/VBoxContainer" unique_id=1557559058]
+layout_mode = 2
+texture = SubResource("AtlasTexture_mgc7w")
+stretch_mode = 3
+
+[connection signal="pressed" from="ColorRect/CenterContainer/VBoxContainer/TextureButton" to="ColorRect" method="_on_texture_button_pressed"]
+[connection signal="pressed" from="ColorRect/CenterContainer/VBoxContainer/TextureButton2" to="ColorRect" method="_on_help_btn"]

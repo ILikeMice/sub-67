@@ -1,8 +1,11 @@
 extends Node2D
 
 @onready var timer: Timer = $Timer
+@onready var timer_bar: Sprite2D = $Bar/Red
 
 const CARD_BACK_TEXTURE: Texture2D = preload("res://assets/other/backside.png")
+const WINNER_TEXTURE: Texture2D = preload("res://assets/other/winner.png")
+const LOSER_TEXTURE: Texture2D = preload("res://assets/other/loser.png")
 
 var cardslist = {1: [], 2: [], 3: []}
 var hovered_cards = []
@@ -16,21 +19,28 @@ var allcards = numbers + specials
 
 var score = 0
 var playerturn = 1
-var time_remaining = 30
+var timerthingything = 20
+var time_remaining = timerthingything
 var timeout_effect_active = false
 var timeout_losing_player = 0
+var game_started = false
+var game_over = false
 
 var plusthree = null
 var timestwo = null
-var skip = null
 var plays_remaining = {1: 1, 2: 1}
 var action_in_progress = false
+
+var timer_bar_full_scale_x: float
+var timer_bar_tween: Tween
 
 
 func _ready() -> void:
 	var draw_area := $Draw/Area2D as Area2D
 	draw_area.input_pickable = true
 	draw_area.input_event.connect(_on_draw_input_event)
+
+	timer_bar_full_scale_x = timer_bar.scale.x
 
 	var card1
 	var card2
@@ -44,16 +54,108 @@ func _ready() -> void:
 
 	_update_card_faces()
 	_update_timer_display()
+	_reset_timer_bar()
 
 	timer.stop()
 	timer.one_shot = true
 	timer.wait_time = 1.0
 	timer.timeout.connect(_on_timeout)
+
+	_run_start_countdown()
+
+
+func _run_start_countdown() -> void:
+	var countdown_node: Node2D = get_node_or_null("StartCountdown")
+	if countdown_node == null:
+		countdown_node = get_node_or_null("Countdown")
+
+	if countdown_node == null:
+		print("Start countdown node not found. Starting game immediately.")
+		game_started = true
+		_reset_timer_bar()
+		timer.start()
+		return
+
+	var number_sprite: Sprite2D = countdown_node.get_node_or_null("Sprite2D")
+	if number_sprite == null:
+		for child in countdown_node.get_children():
+			if child is Sprite2D:
+				number_sprite = child as Sprite2D
+				break
+
+	if number_sprite == null:
+		print("Countdown Sprite2D not found. Starting game immediately.")
+		game_started = true
+		_reset_timer_bar()
+		timer.start()
+		return
+
+	var resting_position := number_sprite.position
+	var resting_scale := number_sprite.scale
+	countdown_node.show()
+
+	for number in [3, 2, 1, 0]:
+		var path := "res://assets/timernums/%d.png" % number
+		var texture := load(path) as Texture2D
+		if texture != null:
+			number_sprite.texture = texture
+		else:
+			push_warning("Countdown texture not found: %s" % path)
+
+		number_sprite.position = resting_position + Vector2(0, -320)
+		number_sprite.scale = resting_scale * 0.3
+		number_sprite.modulate.a = 1.0
+
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(number_sprite, "position", resting_position, 0.6)
+		tween.tween_property(number_sprite, "scale", resting_scale, 0.6)
+		await tween.finished
+
+		await get_tree().create_timer(0.35).timeout
+
+		var exit_tween := create_tween()
+		exit_tween.set_parallel(true)
+		exit_tween.tween_property(number_sprite, "position", resting_position + Vector2(0, 320), 0.25)
+		exit_tween.tween_property(number_sprite, "modulate:a", 0.0, 0.25)
+		await exit_tween.finished
+
+	countdown_node.hide()
+	number_sprite.position = resting_position
+	number_sprite.scale = resting_scale
+	number_sprite.modulate.a = 1.0
+
+	game_started = true
+	_reset_timer_bar()
 	timer.start()
 
 
+func _reset_timer_bar() -> void:
+	if timer_bar_tween and timer_bar_tween.is_running():
+		timer_bar_tween.kill()
+
+	timer_bar_tween = create_tween()
+	timer_bar_tween.set_trans(Tween.TRANS_CUBIC)
+	timer_bar_tween.set_ease(Tween.EASE_OUT)
+	timer_bar_tween.tween_property(
+		timer_bar,
+		"scale:x",
+		timer_bar_full_scale_x,
+		0.4
+	)
+
+func _animate_timer_bar_tick() -> void:
+	if timer_bar_tween and timer_bar_tween.is_running():
+		timer_bar_tween.kill()
+
+	var target_scale_x := float( timer_bar_full_scale_x * float(time_remaining) / timerthingything)
+
+	timer_bar_tween = create_tween()
+	timer_bar_tween.tween_property(timer_bar, "scale:x", target_scale_x, 1.0)
+
+
 func _on_timeout() -> void:
-	if timeout_effect_active:
+	if timeout_effect_active or not game_started or game_over:
 		return
 
 	$Clock1/ClockArrow.rotate(deg_to_rad(45))
@@ -67,12 +169,13 @@ func _on_timeout() -> void:
 		timeout_effect_active = true
 		_start_timeout_effect()
 	else:
+		_animate_timer_bar_tick()
 		timer.start()
 
 
 func _update_timer_display() -> void:
-	var tens := int(time_remaining / 10)
-	var ones := int(time_remaining % 10)
+	var tens: int = int(time_remaining / 10)
+	var ones: int = int(time_remaining % 10)
 
 	$timerthing/num1.texture = load("res://assets/timernums/%s.png" % tens) as Texture2D
 	$timerthing/num2.texture = load("res://assets/timernums/%s.png" % ones) as Texture2D
@@ -118,13 +221,13 @@ func _fade_out_card(card: Node2D) -> void:
 	if not is_instance_valid(card):
 		return
 
-	var player: int = card.get_meta("player", 0)
+	var player: int = int(card.get_meta("player", 0))
 	if not cardslist.has(player):
 		return
 
 	var card_type: String = card.get_meta("cardtype", "")
-
 	hovered_cards.erase(card)
+
 	if current_card == card:
 		current_card = null
 
@@ -133,7 +236,7 @@ func _fade_out_card(card: Node2D) -> void:
 		active_tweens.erase(card)
 
 	var tween := create_tween()
-	tween.tween_property(card, "modulate:a", 0.0, 1)
+	tween.tween_property(card, "modulate:a", 0.0, 1.0)
 	await tween.finished
 
 	if not is_instance_valid(card):
@@ -149,11 +252,12 @@ func _fade_out_card(card: Node2D) -> void:
 
 func _finish_timeout_effect(next_player: int) -> void:
 	playerturn = next_player
-	time_remaining = 30
+	time_remaining = timerthingything
 	timeout_effect_active = false
 
 	_update_timer_display()
 	_update_card_faces()
+	_reset_timer_bar()
 
 	timer.wait_time = 1.0
 	timer.start()
@@ -178,18 +282,8 @@ func _animate_timeout_clock_arrows(tick_count: int) -> void:
 
 	for i in range(tick_count):
 		var step_number := i + 1
-		tween.tween_property(
-			losing_arrow,
-			"rotation",
-			losing_start + step * step_number,
-			0.15
-		)
-		tween.parallel().tween_property(
-			other_arrow,
-			"rotation",
-			other_start - step * step_number,
-			0.15
-		)
+		tween.tween_property(losing_arrow, "rotation", losing_start + step * step_number, 0.15)
+		tween.parallel().tween_property(other_arrow, "rotation", other_start - step * step_number, 0.15)
 
 	await tween.finished
 
@@ -198,7 +292,7 @@ func _animate_card_move(card: Node2D, to_player: int, fade_in: bool) -> void:
 	if not is_instance_valid(card):
 		return
 
-	var from_player: int = card.get_meta("player", 0)
+	var from_player: int = int(card.get_meta("player", 0))
 	if not cardslist.has(from_player) or not cardslist.has(to_player):
 		return
 
@@ -236,7 +330,7 @@ func _animate_card_move(card: Node2D, to_player: int, fade_in: bool) -> void:
 		card.modulate.a = 0.0
 
 	var tween := create_tween()
-	tween.tween_property(card, "global_position", destination, 2)
+	tween.tween_property(card, "global_position", destination, 2.0)
 
 	if fade_in:
 		tween.parallel().tween_property(card, "modulate:a", 1.0, 0.35)
@@ -252,7 +346,7 @@ func _on_draw_input_event(
 	event: InputEvent,
 	_shape_idx: int
 ) -> void:
-	if timeout_effect_active or action_in_progress:
+	if timeout_effect_active or action_in_progress or not game_started or game_over:
 		return
 
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -260,7 +354,7 @@ func _on_draw_input_event(
 
 
 func draw_card() -> void:
-	if timeout_effect_active or action_in_progress:
+	if timeout_effect_active or action_in_progress or not game_started or game_over:
 		return
 
 	if playerturn != 1 and playerturn != 2:
@@ -278,7 +372,7 @@ func draw_card() -> void:
 
 	if score >= 67:
 		print("player ", playerturn, " lost")
-		get_tree().paused = true
+		_end_game(playerturn)
 		return
 
 	if card_type == "death":
@@ -337,7 +431,7 @@ func move_card(card: Node2D, to_player: int) -> void:
 	if not cardslist.has(to_player):
 		return
 
-	var from_player: int = card.get_meta("player", 0)
+	var from_player: int = int(card.get_meta("player", 0))
 	if not cardslist.has(from_player) or from_player == to_player:
 		return
 
@@ -389,7 +483,7 @@ func _on_play_tween_finished(card: Node2D) -> void:
 
 	move_tweens.erase(card)
 
-	var player: int = card.get_meta("player", 0)
+	var player: int = int(card.get_meta("player", 0))
 	if player == 3:
 		_reflow_cards(3)
 
@@ -400,7 +494,6 @@ func _reflow_cards(player: int) -> void:
 
 	for i in range(card_count):
 		var card := hand.get_child(i) as Node2D
-
 		if player == 3:
 			card.position = Vector2.ZERO
 			card.z_index = i
@@ -518,21 +611,20 @@ func findchild(parent: Node, type_name: String) -> Node:
 
 
 func _input(event: InputEvent) -> void:
-	if timeout_effect_active or action_in_progress:
+	if timeout_effect_active or action_in_progress or not game_started or game_over:
 		return
 
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if current_card == null:
 			return
 
-		var owner: int = current_card.get_meta("player", 0)
+		var owner: int = int(current_card.get_meta("player", 0))
 		if owner != playerturn:
 			return
 
 		if owner == 1 or owner == 2:
 			var card_type: String = current_card.get_meta("cardtype", "")
 			var other_player := 2 if owner == 1 else 1
-
 			var score_change: int = 0
 			var applies_score_modifier := false
 
@@ -564,25 +656,22 @@ func _input(event: InputEvent) -> void:
 				if plusthree == owner:
 					score_change += 3
 					plusthree = null
+				if timestwo == owner:
+					score_change *= 2
+					timestwo = null
 
-			if timestwo == owner:
-				score_change *= 2
-				timestwo = null
-
-			score += score_change
+				score += score_change
 
 			print(card_type, " score ", score)
 			_update_score_display()
 
 			if score >= 67:
 				print("player ", owner, " lost")
-				get_tree().paused = true
+				_end_game(owner)
 				return
 
 			move_card(current_card, 3)
-
 			_finish_player_action()
-
 			_update_card_faces()
 
 
@@ -597,6 +686,7 @@ func _discard_random_cards(player: int, amount: int) -> void:
 		var index := randi_range(0, hand.get_child_count() - 1)
 		var card := hand.get_child(index) as Node2D
 		await _fade_out_card(card)
+
 
 func _finish_player_action() -> void:
 	var acting_player: int = int(playerturn)
@@ -617,3 +707,31 @@ func _update_score_display() -> void:
 
 	$Scorebox/num1.texture = load("res://assets/timernums/%s.png" % tens) as Texture2D
 	$Scorebox/num2.texture = load("res://assets/timernums/%s.png" % ones) as Texture2D
+
+
+func _end_game(losing_player: int) -> void:
+	if game_over:
+		return
+
+	game_over = true
+	timer.stop()
+
+	var player1_sprite: Sprite2D = $Player1win/Sprite2D
+	var player2_sprite: Sprite2D = $Player2win/Sprite2D
+
+	var winning_player: int = 2 if losing_player == 1 else 1
+
+	player1_sprite.texture = WINNER_TEXTURE if winning_player == 1 else LOSER_TEXTURE
+	player2_sprite.texture = WINNER_TEXTURE if winning_player == 2 else LOSER_TEXTURE
+
+	_start_blink(player1_sprite)
+	_start_blink(player2_sprite)
+
+
+func _start_blink(sprite: Sprite2D) -> void:
+	sprite.modulate.a = 1.0
+
+	var tween := create_tween()
+	tween.set_loops()
+	tween.tween_property(sprite, "modulate:a", 0.15, 0.4)
+	tween.tween_property(sprite, "modulate:a", 1.0, 0.4)

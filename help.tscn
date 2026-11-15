@@ -1,0 +1,128 @@
+[gd_scene format=3 uid="uid://clqi0curyiq2r"]
+
+[ext_resource type="Texture2D" uid="uid://b22vlv66wfyig" path="res://assets/cards/death.png" id="1_ldbhk"]
+[ext_resource type="Script" uid="uid://dries0io3dlgb" path="res://gotomain.gd" id="1_s5uih"]
+[ext_resource type="FontFile" uid="uid://bkuaubwqldh8j" path="res://assets/other/tiny5.regular.ttf" id="2_y43ri"]
+[ext_resource type="Texture2D" uid="uid://d06xbdtrrkr3l" path="res://assets/cards/discard.png" id="3_hk0a7"]
+[ext_resource type="Texture2D" uid="uid://dstde108rypek" path="res://assets/cards/p3.png" id="4_s5uih"]
+[ext_resource type="Texture2D" uid="uid://c06oddf66gxjm" path="res://assets/cards/skip.png" id="5_ce1yv"]
+[ext_resource type="Texture2D" uid="uid://cxktqtultybvn" path="res://assets/cards/m10.png" id="6_qt58f"]
+[ext_resource type="Texture2D" uid="uid://cie57apeypwfp" path="res://assets/cards/x2.png" id="7_wfqpy"]
+[ext_resource type="Texture2D" uid="uid://bpndfgpd75byh" path="res://assets/other/close.png" id="8_hk0a7"]
+[ext_resource type="Texture2D" uid="uid://blxs34803ax41" path="res://assets/other/close_press.png" id="9_s5uih"]
+
+[node name="Control" type="Control" unique_id=310509588]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=623495360]
+layout_mode = 0
+offset_right = 320.0
+offset_bottom = 180.0
+color = Color(0, 0.45882353, 0.5176471, 1)
+script = ExtResource("1_s5uih")
+
+[node name="GridContainer" type="GridContainer" parent="ColorRect" unique_id=1010283090]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = 10.5
+offset_right = 26.0
+offset_bottom = 10.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 17
+columns = 4
+
+[node name="TextureRect3" type="TextureRect" parent="ColorRect/GridContainer" unique_id=1954892666]
+layout_mode = 2
+texture = ExtResource("1_ldbhk")
+
+[node name="Label" type="Label" parent="ColorRect/GridContainer" unique_id=636088786]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y43ri")
+theme_override_font_sizes/font_size = 10
+text = "Sets the score 
+to 65"
+horizontal_alignment = 1
+
+[node name="TextureRect2" type="TextureRect" parent="ColorRect/GridContainer" unique_id=1972646476]
+layout_mode = 2
+texture = ExtResource("3_hk0a7")
+stretch_mode = 3
+
+[node name="Label2" type="Label" parent="ColorRect/GridContainer" unique_id=1017545397]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y43ri")
+theme_override_font_sizes/font_size = 10
+text = "Discards 2 cards
+from your enemy"
+horizontal_alignment = 1
+
+[node name="TextureRect4" type="TextureRect" parent="ColorRect/GridContainer" unique_id=1279386716]
+layout_mode = 2
+texture = ExtResource("4_s5uih")
+
+[node name="Label3" type="Label" parent="ColorRect/GridContainer" unique_id=903727673]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y43ri")
+theme_override_font_sizes/font_size = 10
+text = "Adds 3 points to the enemies next move"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="TextureRect5" type="TextureRect" parent="ColorRect/GridContainer" unique_id=272544868]
+layout_mode = 2
+texture = ExtResource("5_ce1yv")
+stretch_mode = 3
+
+[node name="Label4" type="Label" parent="ColorRect/GridContainer" unique_id=270776583]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y43ri")
+theme_override_font_sizes/font_size = 10
+text = "You get to skip a move"
+horizontal_alignment = 1
+autowrap_mode = 1
+
+[node name="TextureRect6" type="TextureRect" parent="ColorRect/GridContainer" unique_id=1165248384]
+layout_mode = 2
+texture = ExtResource("6_qt58f")
+
+[node name="Label5" type="Label" parent="ColorRect/GridContainer" unique_id=2059824727]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y43ri")
+theme_override_font_sizes/font_size = 10
+text = "Removes 10 from the score"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="TextureRect7" type="TextureRect" parent="ColorRect/GridContainer" unique_id=964338795]
+layout_mode = 2
+texture = ExtResource("7_wfqpy")
+stretch_mode = 3
+
+[node name="Label6" type="Label" parent="ColorRect/GridContainer" unique_id=1641979484]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y43ri")
+theme_override_font_sizes/font_size = 10
+text = "Doubles your enemies next move if it is a number"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="ColorRect" unique_id=1694478634]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 62.0
+offset_bottom = 62.0
+scale = Vector2(0.25, 0.25)
+texture_normal = ExtResource("8_hk0a7")
+texture_hover = ExtResource("9_s5uih")
+
+[connection signal="pressed" from="ColorRect/TextureButton" to="ColorRect" method="_on_texture_button_pressed"]

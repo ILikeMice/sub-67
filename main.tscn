@@ -13,6 +13,8 @@
 [ext_resource type="Texture2D" uid="uid://dwu00ou1u6cyy" path="res://assets/other/Clock-Arrow.png" id="11_dg77c"]
 [ext_resource type="Texture2D" uid="uid://c1t7ky63a3588" path="res://assets/other/Clock.png" id="12_ycdy4"]
 [ext_resource type="Texture2D" uid="uid://bhjnq2tan1a51" path="res://assets/other/Score-Box.png" id="13_ycdy4"]
+[ext_resource type="Texture2D" uid="uid://bkjtycwaak38g" path="res://assets/timernums/3.png" id="14_w48qg"]
+[ext_resource type="Texture2D" uid="uid://b2cc1srkcn54m" path="res://assets/other/RED.png" id="15_vivmo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tm8yy"]
 size = Vector2(30, 60)
@@ -123,3 +125,27 @@ texture = ExtResource("5_4c57u")
 [node name="num2" type="Sprite2D" parent="Scorebox" unique_id=1737120663]
 position = Vector2(12.5, 0)
 texture = ExtResource("5_4c57u")
+
+[node name="StartCountdown" type="Node2D" parent="." unique_id=1208148409]
+position = Vector2(160, 70)
+
+[node name="Sprite2D" type="Sprite2D" parent="StartCountdown" unique_id=1679352620]
+scale = Vector2(3, 3)
+texture = ExtResource("14_w48qg")
+
+[node name="Player1win" type="Node2D" parent="." unique_id=1911620223]
+position = Vector2(80, 70)
+
+[node name="Sprite2D" type="Sprite2D" parent="Player1win" unique_id=981949755]
+
+[node name="Player2win" type="Node2D" parent="." unique_id=1515275407]
+position = Vector2(240, 70)
+
+[node name="Sprite2D" type="Sprite2D" parent="Player2win" unique_id=1697562668]
+
+[node name="Bar" type="Node2D" parent="." unique_id=1572052279]
+
+[node name="Red" type="Sprite2D" parent="Bar" unique_id=24565947]
+position = Vector2(160, 1.0000001)
+scale = Vector2(5.3333335, 0.033333335)
+texture = ExtResource("15_vivmo")
